@@ -8,6 +8,8 @@ endif
 
 syntax enable 
 
+let g:python3_host_prog = '/usr/local/bin/python3.9'
+
 let g:mapleader = ' '
 let g:maplocalleader = ','
 
@@ -15,7 +17,7 @@ let g:maplocalleader = ','
 set autoindent
 set autoread
 set backspace=indent,eol,start
-set backupdir=/tmp//,.
+" set backupdir=/tmp//,.
 set clipboard=unnamedplus
 set complete+=kspell
 set completeopt=menuone,longest
@@ -31,13 +33,14 @@ set incsearch
 set laststatus=2
 set matchpairs+=<:> " Use % to jump between pairs
 set mouse=a
-set nocompatible
+" set nocompatible
 set noerrorbells visualbell t_vb=
 set noshiftround
 set nospell
 set nostartofline
 set noswapfile
 set noshowmode
+set nowritebackup
 set number relativenumber
 set regexpengine=1
 set ruler
@@ -56,26 +59,28 @@ set ttimeout
 set timeoutlen=1000
 set ttimeoutlen=0
 set ttyfast
-set undodir=/tmp
-set undofile
+" set undodir=/tmp
+" set undofile
 set virtualedit=block
 set whichwrap=b,s,<,>
 set wildmenu
 set wildmode=full
 set wrap
 
+autocmd InsertLeave * :normal `^
 
 call plug#begin('~/.vim/plugged')
 Plug 'vim-python/python-syntax'
-Plug 'othree/html5.vim'
+" Plug 'othree/html5.vim'
 Plug 'tpope/vim-sensible'
-Plug 'preservim/nerdtree'
-Plug 'jistr/vim-nerdtree-tabs'
+"Plug 'preservim/nerdtree'
+"Plug 'jistr/vim-nerdtree-tabs'
+Plug 'vifm/vifm.vim'
 Plug 'jiangmiao/auto-pairs'
 Plug 'dense-analysis/ale'
 Plug 'majutsushi/tagbar'
 Plug 'vim-scripts/indentpython.vim'
-Plug 'lepture/vim-jinja'
+" Plug 'lepture/vim-jinja'
 Plug 'pangloss/vim-javascript'
 Plug 'alvan/vim-closetag'
 Plug 'maxmellon/vim-jsx-pretty'
@@ -88,30 +93,32 @@ Plug 'vim-airline/vim-airline'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'liuchengxu/vim-which-key'
 Plug 'jmcantrell/vim-virtualenv'
-Plug 'kiteco/vim-plugin'
+Plug 'neoclide/coc.nvim', {'branch': 'release'}
 Plug 'tmux-plugins/vim-tmux'
 Plug 'godlygeek/tabular'
 Plug 'plasticboy/vim-markdown'
 Plug 'iamcco/markdown-preview.nvim', { 'do': 'cd app & yarn install' }
-"Plug 'vim-syntastic/syntastic'
-"Plug 'nvie/vim-flake8'
-
+Plug 'junegunn/fzf', {'dir': '~/.fzf', 'do': './install --all'}
+Plug 'junegunn/fzf.vim'
+Plug 'tpope/vim-commentary'
+Plug 'drewtempelmeyer/palenight.vim'
 call plug#end()
 
 " Enable 24-bit true colors if your terminal supports it.
-if (has("termguicolors"))
+"if (has("termguicolors"))
   " https://github.com/vim/vim/issues/993#issuecomment-255651605
-  let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
-  let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
-
-  set termguicolors
-endif
+let &t_8f = "\<Esc>[38;2;%lu;%lu;%lum"
+let &t_8b = "\<Esc>[48;2;%lu;%lu;%lum"
+set termguicolors
+"endif
 
 filetype on
 filetype plugin indent on
 
 " let g:ale_virtualenv_dir_names = []
-" let g:ale_linters_explicit = 1
+let g:ale_linters_explicit = 1
+" let g:ale_completion_enabled = 1
+" let g:ale_disable_lsp = 1
 
 if need_to_install_plugins == 1
     echo "Installing plugins..."
@@ -121,9 +128,10 @@ if need_to_install_plugins == 1
 endif
 
 " always show the status bar
-
 set bg=dark
+" colorscheme palenight
 colorscheme gruvbox
+highlight Comment cterm=italic
 
 " let g:airline_theme='gruvbox'
 let g:airline_theme='powerlineish'
@@ -181,11 +189,11 @@ nmap <leader>2 :bn<CR>
 autocmd BufReadPost * if line("'\"") > 1 && line("'\"") <= line("$") | exe "normal! g'\"" | endif
 
 " file browser
-let NERDTreeIgnore = ['\.pyc$', '__pycache__']
-let NERDTreeQuitOnOpen=1
-let g:NERDTreeMinimalUI=1
-nmap <leader>n :NERDTreeToggle<CR>
-
+" let NERDTreeIgnore = ['\.pyc$', '__pycache__']
+" let NERDTreeQuitOnOpen=1
+" let g:NERDTreeMinimalUI=1
+" nmap <leader>n :NERDTreeToggle<CR>
+nmap <leader>n :EditVifm .<CR>
 " ale
 map <C-e> <Plug>(ale_next_wrap)
 map <C-r> <Plug>(ale_previous_wrap)
@@ -224,7 +232,7 @@ function SpellToggle()
             set nospell
         else
             set spell
-            set spelllang=nb ",nn,en_us
+            set spelllang=nb ,en_us
     endif
 endfunction
 " nnoremap <silent> <Leader>s :call SpellToggle()<CR>
@@ -234,6 +242,7 @@ endfunction
 " source: https://coderwall.com/p/if9mda/automatically-set-paste-mode-in-vim-when-pasting-in-insert-mode
 let &t_SI .= "\<Esc>[?2004h"
 let &t_EI .= "\<Esc>[?2004l"
+
 
 " WhicKey
 call which_key#register('<Space>', "g:which_key_map")
@@ -253,7 +262,7 @@ let g:which_key_map.b = {
       \ 'b' : ['CtrlPBuffer', 'Bufferlist'] ,
       \ 'e' : [':tabnew $MYVIMRC', 'Edit vimrc in new tab'],
       \ }
-let g:which_key_map['w'] = {
+let g:which_key_map.w = {
       \ 'name' : '+windows' ,
       \ 'w' : ['<C-W>w'     , 'other-window']          ,
       \ 'd' : ['<C-W>c'     , 'delete-window']         ,
@@ -274,7 +283,7 @@ let g:which_key_map['w'] = {
       \ '?' : ['Windows'    , 'fzf-window']            ,
       \ }
 
-let g:which_key_map['s'] = {
+let g:which_key_map.s = {
       \ 'name': '+spellcheck',
       \ 't': [':call SpellToggle()', 'toggle-spell'],
       \ 'n': [':setlocal spelllang=nb', 'switch-to-norwegian-dictionary'], 
@@ -282,13 +291,16 @@ let g:which_key_map['s'] = {
       \ 'p': [':normal! mz[s1z=`z<CR>', 'replace last misspelled word'], 
       \}
 
-let g:which_key_map['r'] = {
+let g:which_key_map.r = {
     \ 'name': '+replace',
     \ 'r': [':%s///g<left><left>', 'replace-under-cursor'],
     \ 'q': [':%s///gc<left><left><left>', 'query-replace-under-cursor'],
     \ 'v': [':s///g<left><left>', 'replace-in-selection'],
     \ 'x': [':s///gc<left><left><left>', 'query-replace-in-selection']
     \}
+" let g:which_key_map.g = {
+"     \ 'name': '+coc',
+"     \}
 
 function! XTermPasteBegin()
     set pastetoggle=<Esc>[201~
@@ -297,15 +309,15 @@ function! XTermPasteBegin()
 endfunction
 
 " kite stuff
-let g:kite_tab_complete = 1 
-let g:kite_return_complete = 1
-set completeopt+=menuone
-set completeopt+=noselect
+" let g:kite_tab_complete = 1 
+" let g:kite_return_complete = 1
+" set completeopt+=menuone
+" set completeopt+=noselect
 " set completeopt+=noinsert
-" set completeopt+=preview
+ "set completeopt+=preview
 
-autocmd CompleteDone * if !pumvisible() | pclose | endif
-set belloff+=ctrlg
+" autocmd CompleteDone * if !pumvisible() | pclose | endif
+" set belloff+=ctrlg
  
 " set aa to be aa again
 let g:AutoPairsShortcutFastWrap = "<C-f>"
@@ -313,48 +325,6 @@ let g:AutoPairsShortcutFastWrap = "<C-f>"
 :autocmd InsertEnter,InsertLeave * set cul!
 
 inoremap <special> <expr> <Esc>[200~ XTermPasteBegin()
-
-fun! ReplaceAll()
-    " Don't do anything if there isn't a search pattern.
-    if @/ is# '' 
-        return
-    endif
-
-    " Save view state and wrapscan setting.
-    let l:save = winsaveview()
-    let l:old_ws = &wrapscan
-
-    try
-        " Make sure search won't wrap around.
-        set nowrapscan
-
-        while 1
-            " Go to next match and select.
-            let l:pos = getpos('.')
-            try
-                normal! n
-            catch
-                " E385: search hit BOTTOM without match for: xzxxx
-                " Also catch other errors.
-                break
-            endtry
-
-            " Position unchanged; shoudn't happen AFAIK, but better
-            " check otherwise you're going to end up in an infinite
-            " loop!
-            if getpos('.') == l:pos
-                break
-            endif
-
-            " Apply last edit command.
-            normal! .
-        endwhile
-    finally
-        " Restore view.
-        call winrestview(l:save)
-        let &wrapscan = l:old_ws
-    endtry
-endfun
 
 "..................................................
 " plasticboy/vim-markdown
@@ -381,5 +351,125 @@ let g:mkdp_markdown_css=fnameescape($HOME).'/.local/lib/github-markdown-css/gith
 
 " Cycle through splits.
 nnoremap <S-Tab> <C-w>w
+
+
+" junegunn/fzf
+nnoremap <leader><space> :GFiles<CR>
+nnoremap <leader>ff :Rg<CR>
+inoremap <expr> <c-x><c-f> fzf#vim#complete#path(
+            \ "find . -path '*/\.*' -prune -o -print \| sed '1d;s:^..::'",
+            \ fzf#wrap({'dir': expand('%:p:h')}))
+if has('nvim')
+    au! TermOpen * tnoremap <buffer> <Esc> <c-\><c-n>
+    au! FileType fzf tunmap <buffer> <Esc>
+endif
+
+" coc
+" Always show the signcolumn, otherwise it would shift the text each time
+" diagnostics appear/become resolved.
+" if has("nvim-0.5.0") || has("patch-8.1.1564")
+"   " Recently vim can merge signcolumn and number column into one
+"   set signcolumn=number
+" else
+"   set signcolumn=yes
+" endif
+set signcolumn=number
+
+" Use tab for trigger completion with characters ahead and navigate.
+" NOTE: Use command ':verbose imap <tab>' to make sure tab is not mapped by
+" other plugin before putting this into your config.
+inoremap <silent><expr> <TAB>
+      \ pumvisible() ? "\<C-n>" :
+      \ <SID>check_back_space() ? "\<TAB>" :
+      \ coc#refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+function! s:check_back_space() abort
+  let col = col('.') - 1
+  return !col || getline('.')[col - 1]  =~# '\s'
+endfunction
+
+" Use <c-space> to trigger completion.
+" if has('nvim')
+"   inoremap <silent><expr> <c-space> coc#refresh()
+" else
+"   inoremap <silent><expr> <c-@> coc#refresh()
+" endif
+inoremap <silent><expr> <c-@> coc#refresh()
+
+" Make <CR> auto-select the first completion item and notify coc.nvim to
+" format on enter, <cr> could be remapped by other vim plugin
+inoremap <silent><expr> <cr> pumvisible() ? coc#_select_confirm()
+                              \: "\<C-g>u\<CR>\<c-r>=coc#on_enter()\<CR>"
+
+" Use `[g` and `]g` to navigate diagnostics
+" Use `:CocDiagnostics` to get all diagnostics of current buffer in location list.
+nmap <silent> [g <Plug>(coc-diagnostic-prev)
+nmap <silent> ]g <Plug>(coc-diagnostic-next)
+
+" GoTo code navigation.
+nmap <silent> gd <Plug>(coc-definition)
+nmap <silent> gy <Plug>(coc-type-definition)
+nmap <silent> gi <Plug>(coc-implementation)
+nmap <silent> gr <Plug>(coc-references)
+
+" Use K to show documentation in preview window.
+nnoremap <silent> K :call <SID>show_documentation()<CR>
+
+function! s:show_documentation()
+  if (index(['vim','help'], &filetype) >= 0)
+    execute 'h '.expand('<cword>')
+  elseif (coc#rpc#ready())
+    call CocActionAsync('doHover')
+  else
+    execute '!' . &keywordprg . " " . expand('<cword>')
+  endif
+endfunction
+
+" Highlight the symbol and its references when holding the cursor.
+autocmd CursorHold * silent call CocActionAsync('highlight')
+
+" Symbol renaming.
+nmap <leader>rn <Plug>(coc-rename)
+
+" Formatting selected code.
+xmap <leader>f  <Plug>(coc-format-selected)
+nmap <leader>f  <Plug>(coc-format-selected)
+
+augroup mygroup
+  autocmd!
+  " Setup formatexpr specified filetype(s).
+  autocmd FileType typescript,json setl formatexpr=CocAction('formatSelected')
+  " Update signature help on jump placeholder.
+  autocmd User CocJumpPlaceholder call CocActionAsync('showSignatureHelp')
+augroup end
+
+" Applying codeAction to the selected region.
+" Example: `<leader>aap` for current paragraph
+xmap <leader>a  <Plug>(coc-codeaction-selected)
+nmap <leader>a  <Plug>(coc-codeaction-selected)
+
+" Remap keys for applying codeAction to the current buffer.
+nmap <leader>ac  <Plug>(coc-codeaction)
+" Apply AutoFix to problem on the current line.
+nmap <leader>qf  <Plug>(coc-fix-current)
+
+" Remap <C-f> and <C-b> for scroll float windows/popups.
+" if has('nvim-0.4.0') || has('patch-8.2.0750')
+nnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+nnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+inoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(1)\<cr>" : "\<Right>"
+inoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? "\<c-r>=coc#float#scroll(0)\<cr>" : "\<Left>"
+vnoremap <silent><nowait><expr> <C-f> coc#float#has_scroll() ? coc#float#scroll(1) : "\<C-f>"
+vnoremap <silent><nowait><expr> <C-b> coc#float#has_scroll() ? coc#float#scroll(0) : "\<C-b>"
+" endif
+
+nnoremap <nowait><silent> <C-l> :noh<CR>
+au BufNewFile,BufRead *.djhtml set filetype=htmldjango
+
+" let g:coc_filetype_map = {
+"   \ 'htmldjango': 'djhtml',
+"   \ }
+
 
 
