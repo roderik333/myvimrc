@@ -1,0 +1,43 @@
+{
+    "diagnostic.displayedByAle": false,
+    "pyright.enable": true,
+    "python.formatting.provider": "black",
+    "python.formatting.blackArgs": [
+        {
+            "line-length": 119
+        }
+    ],
+    "python.formatting.autopep8Path": "autopep8",
+    "python.formatting.autopep8Args": [
+        "experimental"
+    ],
+    "python.linting.flake8Enabled": true,
+    "python.linting.mypyEnabled": true,
+    "python.linting.flake8Args": [
+        "--ignore=E501, W503, E123, E126, E128",
+        "max-line-length = 119",
+        "select = C,E,F,W,B,B950"
+    ],
+    "pyright.organizeimports.provider": "pyright",
+    "snippets.loadFromExtensions": true,
+    "coc.preferences.formatOnSaveFiletypes": [
+        "css",
+        "html",
+        "Markdown",
+        "javascript",
+        "typescript",
+        "typescriptreact",
+        "json",
+        "javascriptreact",
+        "typescript.tsx"
+    ],
+    "html.enable": true,
+    "html.format.enable": true,
+    "html.filetypes": [
+        "html",
+        "djhtml",
+        "handlebars",
+        "htmldjango"
+    ],
+    "css.enable": true
+}
